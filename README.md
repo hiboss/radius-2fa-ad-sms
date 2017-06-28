@@ -20,3 +20,5 @@ This simple RADIUS server provides 2FA for devices and software with RADIUS supp
 ## Tested with
 
 This has only been tested with Citrix NetScaler 11 so far. Feel free to test this with other appliances/software and give me some feedback.
+## Tested with
+Successful test with ASA firewal Ipsec VPN and SSL VPN,it works
