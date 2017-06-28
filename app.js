@@ -23,8 +23,8 @@ var domainify = function(name) {
 // radius secret
 var secret = 'radius_secret'
 
-// challange timeout in minutes
-//var timeout = 2
+// challange timeout in five minutes
+var timeout = []
 
 // use challenges array as temporary store
 var challenges = []
@@ -82,12 +82,17 @@ server.on("message", function (msg, rinfo) {
 					console.log('found challenge for user '+username)
 					if(challenges[i].code == password) {
 						console.log('correct code ' + password)
-						challenges.splice(i,1);
+						challenges.splice(i,1);						
 						sendResponse('Access-Accept')
+						clearTimeout(timeout[i]);
+						console.log(username+'has login success')
+						break;   //if code is corret,exit for the loop
 					} else {
 						console.log('wrong code')
-						challenges.splice(i,1);
-						sendResponse('Access-Reject')
+						//challenges.splice(i,1);
+						//sendResponse('Access-Reject')
+						sendResponse('Access-Challenge')
+						break;
 					}
 				}
 				if (i+1 == challenges.length) {
@@ -127,11 +132,17 @@ server.on("message", function (msg, rinfo) {
 							// has phonenumber
 							request.get(highside + user.telephoneNumber, function (error, response, body) {
 								if (!error && response.statusCode == 200) {
+									// Set password valid for 5 minutes 
+							               timeout[challenges.length]=setTimeout(function(){	
+								                challenges.splice(0,1);
+								                sendResponse('Access-Reject')
+                                                                                console.log('Time out in 5 minutes for user:'+username) 
+							                },300000);
 									user.code = body
-									challenges.push(user)
+									challenges.push(user)									
 									sendResponse('Access-Challenge')
 								}
-							})
+							})							
 						} else {
 							console.log('No phone number found. Cannot send text')
 							sendResponse('Access-Reject')
